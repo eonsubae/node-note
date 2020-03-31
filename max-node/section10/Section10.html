@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <title>Section 10. SQL Introduction</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        <link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        <script src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+    </head>
+    <body>
+        <h1 id="section-10-sql-introduction">Section 10. SQL Introduction</h1>
+<h3 id="lecture-132-choosing-a-database">lecture 132. Choosing a Database</h3>
+<p>데이터를 저장하고 쉽게 접근하는 것이 목적일 때</p>
+<ul>
+<li>데이터베이스를 사용하는 것이 가장 적합하다</li>
+<li>이전 섹션처럼 파일을 사용하는 것은 성능 저하가 심하다</li>
+<li>데이터베이스를 사용하면 작은 정보를 얻기 위해 전체 파일을 읽어오지 않아도 된다</li>
+</ul>
+<p>데이터베이스 선택</p>
+<ul>
+<li>데이터베이스는 크게 SQL과 NoSQL로 나뉜다</li>
+</ul>
+<p>SQL</p>
+<ul>
+<li>SQL 데이터베이스는 테이블들의 조합으로 불린다
+<ul>
+<li>Users, Products, Orders etc...</li>
+</ul>
+</li>
+<li>각각의 테이블은 필드 혹은 컬럼을 가진다
+<ul>
+<li>Users(id, email, name), Products(id, title, price, description)</li>
+</ul>
+</li>
+<li>SQL은 서로 다른 테이블을 연관짓는 것을 가능하게 해준다
+<ul>
+<li>Orders(id, user_id, product_id)</li>
+</ul>
+</li>
+</ul>
+<p>SQL 데이터베이스의 특징</p>
+<ul>
+<li>데이터 스키마 정의가 중요하다
+<ul>
+<li>각 테이블은 명확하게 데이터가 어떻게 정의되고 어떤 타입으로 각 필드가 지정되어야 하는지를 정해야한다</li>
+<li>강력한 스키마에 의해 테이블 안의 모든 데이터는 제한을 받는다</li>
+</ul>
+</li>
+<li>데이터 관계
+<ul>
+<li>테이블과 다른 테이블 간의 관계를 이용해 데이터를 다룬다</li>
+<li>one to one, one to many, many to many</li>
+</ul>
+</li>
+<li>쿼리문</li>
+</ul>
+<pre><code class="language-sql"><div><span class="hljs-keyword">SELECT</span> * <span class="hljs-keyword">FROM</span> <span class="hljs-keyword">users</span> <span class="hljs-keyword">WHERE</span> age &gt; <span class="hljs-number">28</span>
+</div></code></pre>
+<ul>
+<li>SELECT, FROM, WHERE은 SQL 키워드(문법)에 해당된다</li>
+<li>*, users, age &gt; 28은 파라미터(데이터)에 해당된다</li>
+<li>이렇게 SQL 문법과 파라미터(데이터)에 의해 SQL은 작동한다</li>
+</ul>
+<hr>
+<h3 id="lecture-133-nosql-introduction">lecture 133. NoSQL Introduction</h3>
+<p>NoSQL의 특징</p>
+<ul>
+<li>SQL과 마찬가지로 데이터를 저장하는 데이터베이스를 가진다(ex. Shop)</li>
+<li>SQL에서는 Users, Orders 같은 테이블이 있다</li>
+<li>NoSQL에서는 SQL의 테이블을 Collection이라 부른다</li>
+<li>NoSQL에는 SQL 같은 고정된 스키마가 없다</li>
+<li>대신 documents라고 부르는 자바스크립트 오브젝트와 유사한 데이터 구조가 있다</li>
+<li>콜렉션 내부의 다수의 documents들은 서로 다른 구조를 가질 수 있다
+<ul>
+<li>ex. 첫 번째 유저 : { name: 'Max', age: 29 }</li>
+<li>ex. 두 번째 유저 : { name: 'Manu' }</li>
+</ul>
+</li>
+<li>NoSQL에서는 실제로 테이블 간의 관계는 존재하지 않는다
+<ul>
+<li>대신 중복된 데이터를 사용한다</li>
+<li>따라서 한 컬렉션의 데이터가 바뀌면, 중복된 데이터를 저장한 다른 컬렉션의 데이터도 변경된다</li>
+</ul>
+</li>
+</ul>
+<p>간략하게 정리</p>
+<ol>
+<li>NoSQL은 데이터 스키마가 없다
+<ul>
+<li>특정 데이터 구조를 요구받지 않는다</li>
+</ul>
+</li>
+<li>NoSQL은 데이터 관계가 없다
+<ul>
+<li>documents들을 연관지을 수는 있지만 SQL의 join문 같은 복잡하고 긴 쿼리문을 요구하지 않는다</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="lecture-134-comparing-sql-and-nosql">lecture 134. Comparing SQL and NoSQL</h3>
+<p>수평 확장 vs 수직 확장</p>
+<ul>
+<li>수평 확장은 추가로 서버의 갯수를 늘리는 것을 말한다
+<ul>
+<li>필요시마다 서버를 구매해 서버들에 데이터를 분산시켜 저장하는 방법이다</li>
+<li>분산된 데이터를 효과적으로 병합하는 쿼리를 작성하는 작업이 어렵다</li>
+</ul>
+</li>
+<li>수직 확장은 현재 보유한 서버의 성능을 높이는 것을 말한다
+<ul>
+<li>분산 저장, 병합을 위한 복잡한 작업 없이도 확장이 가능한 매우 쉬운 방법이다</li>
+<li>문제는 한 대의 서버를 무한정 업그레이드 할 수는 없다</li>
+</ul>
+</li>
+</ul>
+<p>SQL vs NoSQL</p>
+<ul>
+<li>SQL
+<ul>
+<li>데이터는 스키마를 활용해 저장한다</li>
+<li>관계들이 중요하다</li>
+<li>데이터는 다수의 테이블에 분산되어 저장된다</li>
+<li>수평 확장이 매우 어렵거나 불가능하다. 수직 확장은 가능하다</li>
+<li>수 많은 데이터를 읽고 쓰는 쿼리를 작성하는 데 한계가 있다</li>
+</ul>
+</li>
+<li>NoSQL
+<ul>
+<li>스키마가 없다</li>
+<li>관계들이 없거나 매우 적다</li>
+<li>데이터를 일반적으로 컬렉션들에 중첩/병합시킨다</li>
+<li>수평과 수직 확장 모두 가능하다</li>
+<li>대량의 데이터를 저장하는 데 좋은 성능을 보인다</li>
+</ul>
+</li>
+<li>위 설명만 보면 SQL을 사용할 이유는 없어 보인다
+<ul>
+<li>하지만 데이터베이스에 저장할 데이터의 종류에 따라 선택은 달라진다</li>
+<li>데이터 간의 관계가 매우 중요한 데이터를 저장할 때는 SQL이 더 적합하다</li>
+<li>또, 데이터가 자주 변경되지 않는 경우에도 SQL이 좋다</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="lecture-136-connecting-our-app-to-the-sql-database">lecture 136. Connecting our App to the SQL Database</h3>
+<p>mysql2 패키지 설치</p>
+<pre><code class="language-terminal"><div>$ npm i --save mysql2
+</div></code></pre>
+<p>데이터베이스와 애플리케이션을 연결할 유틸 파일 작성하기</p>
+<ul>
+<li>util/database.js 파일을 생성하고 아래 코드를 입력한다</li>
+</ul>
+<pre><code class="language-js"><div><span class="hljs-keyword">const</span> mysql = <span class="hljs-built_in">require</span>(<span class="hljs-string">'mysql2'</span>);
+
+<span class="hljs-keyword">const</span> pool = mysql.createPool({
+    <span class="hljs-attr">host</span>: <span class="hljs-string">'localhost'</span>,
+    <span class="hljs-attr">user</span>: <span class="hljs-string">'root'</span>,
+    <span class="hljs-attr">database</span>: <span class="hljs-string">'node-complete'</span>,
+    <span class="hljs-attr">password</span>: <span class="hljs-string">'your password'</span>
+});
+
+<span class="hljs-built_in">module</span>.exports = pool.promise();
+</div></code></pre>
+<ul>
+<li>데이터베이스 풀을 만들어서 연결하고 있다</li>
+<li>쿼리문을 작성할 때마다 연결하는 비용을 줄이기 위해 미리 연결을 맺어두는 방식이다</li>
+<li>pool.promise()는 비동기적 작업을 처리할 때 콜백패턴이 아닌 프로미스를 사용하게 해준다</li>
+</ul>
+<p>앱에 연결하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// app.js</span>
+(...)
+<span class="hljs-keyword">const</span> db = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./util/database'</span>);
+(...)
+
+db.execute(<span class="hljs-string">'SELECT * FROM products'</span>)
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result[<span class="hljs-number">0</span>], result[<span class="hljs-number">1</span>]);
+  })
+  .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(err);
+  });
+(...)
+</div></code></pre>
+<ul>
+<li>db.execute()메서드를 사용해 쿼리문을 실행할 수 있다</li>
+<li>위 쿼리문을 실행하려면 MySQL 워크벤치에서 products라는 테이블을 미리 만들어 놔야 한다</li>
+<li>쿼리문의 결과는 배열 안에 두 개의 배열이 있는 형태로 반환된다
+<ul>
+<li>첫 번째 중첩 배열에는 실제 데이터가 들어있고 두 번째 중첩 배열에는 메타 데이터가 들어 있다</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="lecture-137-basic-sql--creating-a-table">lecture 137. Basic SQL &amp; Creating a Table</h3>
+<p>products 테이블 만들기</p>
+<pre><code class="language-sql"><div><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TABLE</span> <span class="hljs-string">`node-complete`</span>.<span class="hljs-string">`products`</span> (
+  <span class="hljs-string">`id`</span> <span class="hljs-built_in">INT</span> <span class="hljs-keyword">UNSIGNED</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span> AUTO_INCREMENT,
+  <span class="hljs-string">`title`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,
+  <span class="hljs-string">`price`</span> <span class="hljs-keyword">DOUBLE</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,
+  <span class="hljs-string">`description`</span> <span class="hljs-built_in">TEXT</span> <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,
+  <span class="hljs-string">`imageUrl`</span> <span class="hljs-built_in">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">NOT</span> <span class="hljs-literal">NULL</span>,
+  PRIMARY <span class="hljs-keyword">KEY</span> (<span class="hljs-string">`id`</span>),
+  <span class="hljs-keyword">UNIQUE</span> <span class="hljs-keyword">INDEX</span> <span class="hljs-string">`id_UNIQUE`</span> (<span class="hljs-string">`id`</span> <span class="hljs-keyword">ASC</span>) <span class="hljs-keyword">VISIBLE</span>);
+</div></code></pre>
+<hr>
+<h3 id="lecture-139-fetching-products">lecture 139. Fetching Products</h3>
+<p>파일로 저장했던 상품 데이터 코드를 데이터베이스를 사용하도록 변경하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// models/product.js</span>
+<span class="hljs-keyword">const</span> db = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../util/database'</span>);
+
+<span class="hljs-keyword">const</span> Cart = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./cart'</span>);
+
+<span class="hljs-built_in">module</span>.exports = <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Product</span> </span>{
+  <span class="hljs-keyword">constructor</span>(id, title, imageUrl, description, price) {
+    <span class="hljs-keyword">this</span>.id = id;
+    <span class="hljs-keyword">this</span>.title = title;
+    <span class="hljs-keyword">this</span>.imageUrl = imageUrl;
+    <span class="hljs-keyword">this</span>.description = description;
+    <span class="hljs-keyword">this</span>.price = price;
+  }
+
+  save() {
+    
+  }
+
+  <span class="hljs-keyword">static</span> deleteById(id) {
+    
+  }
+
+  <span class="hljs-keyword">static</span> fetchAll() {
+    <span class="hljs-keyword">return</span> db.execute(<span class="hljs-string">'SELECT * FROM products'</span>);
+  }
+
+  <span class="hljs-keyword">static</span> findById(id, cb) {
+    
+  }
+};
+</div></code></pre>
+<ul>
+<li>조회 메서드(fetchAll)에서 products 테이블의 모든 데이터를 조회하는 쿼리문을 작성해서 반환했다</li>
+<li>이렇게 반환된 메서드는 앞서 util/database.js에서 pool.promise()에 의해 프로미스로 작동한다</li>
+</ul>
+<p>반환된 프로미스를 조작해 데이터 읽기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// controllers/shop.js</span>
+exports.getProducts = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  Product.fetchAll()
+    .then(<span class="hljs-function">(<span class="hljs-params">[rows, fieldData]</span>) =&gt;</span> {
+      res.render(<span class="hljs-string">'shop/product-list'</span>, {
+        <span class="hljs-attr">prods</span>: rows,
+        <span class="hljs-attr">pageTitle</span>: <span class="hljs-string">'All Products'</span>,
+        <span class="hljs-attr">path</span>: <span class="hljs-string">'/products'</span>
+      })
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(e));
+};
+(...)
+exports.getIndex = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  Product.fetchAll()
+    .then(<span class="hljs-function">(<span class="hljs-params">[rows, fieldData]</span>) =&gt;</span> {
+      res.render(<span class="hljs-string">'shop/index'</span>, {
+        <span class="hljs-attr">prods</span>: rows,
+        <span class="hljs-attr">pageTitle</span>: <span class="hljs-string">'Shop'</span>,
+        <span class="hljs-attr">path</span>: <span class="hljs-string">'shop/index'</span>
+      });
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(e));
+};
+(...)
+</div></code></pre>
+<ul>
+<li>임의의 데이터를 테이블에 추가하고 Shop과 Products 네비게이션이 잘 작동하는지 확인해보자</li>
+</ul>
+<hr>
+<h3 id="lecture-141-inserting-data-into-the-database">lecture 141. Inserting Data Into the Database</h3>
+<p>데이터베이스에 데이터를 추가하는 로직 작성하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// models/product.js</span>
+(...)
+save() {
+    <span class="hljs-keyword">return</span> db.execute(
+      <span class="hljs-string">'INSERT INTO products (title, price, imageUrl, description) VALUES(?, ?, ?, ?)'</span>,
+      [<span class="hljs-keyword">this</span>.title, <span class="hljs-keyword">this</span>.price, <span class="hljs-keyword">this</span>.imageUrl, <span class="hljs-keyword">this</span>.description]
+    );
+}
+(...)
+
+<span class="hljs-comment">// controllers/admin.js</span>
+(...)
+exports.postAddProduct = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> title = req.body.title;
+  <span class="hljs-keyword">const</span> imageUrl = req.body.imageUrl;
+  <span class="hljs-keyword">const</span> price = req.body.price;
+  <span class="hljs-keyword">const</span> description = req.body.description;
+  <span class="hljs-keyword">const</span> product = <span class="hljs-keyword">new</span> Product(<span class="hljs-literal">null</span>, title, imageUrl, description, price);
+  product.save()
+    .then(<span class="hljs-function"><span class="hljs-params">_</span> =&gt;</span> res.redirect(<span class="hljs-string">'/'</span>))
+    .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(e));
+};
+(...)
+</div></code></pre>
+<ul>
+<li>sql injection을 피하기 위해 value의 인자로 ?를 지정한다</li>
+<li>execute 메서드의 두 번째 인자로 ?에 들어갈 데이터를 순서대로 배열의 요소로 작성한다</li>
+<li>save를 리턴받고 대너블 체인에서 리다이렉트하도록 컨트롤러 로직을 변경해주고 있다</li>
+<li>저장하고 Add Products에서 상품을 추가해보자</li>
+</ul>
+<hr>
+<h3 id="lecture-142-fetching-a-single-product-with-the-%22where%22-condition">lecture 142. Fetching a Single Product with the &quot;where&quot; Condition</h3>
+<p>where 절을 이용해 한 개의 상품을 조회하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// models/product.js</span>
+(...)
+<span class="hljs-keyword">static</span> findById(id) {
+    <span class="hljs-keyword">return</span> db.execute(<span class="hljs-string">'SELECT * FROM products WHERE products.id = ?'</span>, [id]);
+}
+(...)
+
+<span class="hljs-comment">// controllers/shop.js</span>
+(...)
+exports.getProduct = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> prodId = req.params.productId;
+  Product.findById(prodId)
+    .then(<span class="hljs-function">(<span class="hljs-params">[product]</span>) =&gt;</span> {
+      res.render(<span class="hljs-string">'shop/product-detail'</span>, {
+        <span class="hljs-attr">product</span>: product[<span class="hljs-number">0</span>],
+        <span class="hljs-attr">pageTitle</span>: product[<span class="hljs-number">0</span>].title,
+        <span class="hljs-attr">path</span>: <span class="hljs-string">'/products'</span>
+      });
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> <span class="hljs-built_in">console</span>.log);
+};
+(...)
+</div></code></pre>
+
+    </body>
+    </html>
