@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <title>Section 11. Understanding Sequelize</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        <link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        <script src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+    </head>
+    <body>
+        <h1 id="section-11-understanding-sequelize">Section 11. Understanding Sequelize</h1>
+<h3 id="lecture-146-what-is-sequelize">lecture 146. What is Sequelize?</h3>
+<p>Sequelize란?</p>
+<ul>
+<li>ORM(object relational mapping) 라이브러리</li>
+<li>복잡하고 긴 SQL 코드를 자바스크립트 오브젝트로 매핑시켜주는 편리한 메서드들을 제공한다</li>
+<li>직접 SQL 코드를 작성할 필요가 없다</li>
+</ul>
+<p>간단한 예제</p>
+<ul>
+<li>User 테이블은 name, age, email, password 필드를 가지고 있다</li>
+<li>Sequelize를 사용하면 {name:'qveqr' age:25 email:'vemqe@mveqr.com' password:'sfae'}만 작성하면 된다</li>
+<li>뒷단에서 라이브러리가 자동으로 변경해준다</li>
+</ul>
+<pre><code class="language-js"><div><span class="hljs-keyword">const</span> user = User.create({<span class="hljs-attr">name</span>:<span class="hljs-string">'qveqr'</span> age:<span class="hljs-number">25</span> email:<span class="hljs-string">'vemqe@mveqr.com'</span> password:<span class="hljs-string">'sfae'</span>});
+</div></code></pre>
+<pre><code class="language-sql"><div><span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">INTO</span> <span class="hljs-keyword">user</span> (<span class="hljs-keyword">name</span>, age, email, <span class="hljs-keyword">password</span>) <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">'qveqr'</span>, <span class="hljs-number">25</span>, <span class="hljs-string">'vemqe@mveqr.com'</span>, <span class="hljs-string">'sfae'</span>);
+</div></code></pre>
+<hr>
+<h3 id="lecture-147-connecting-to-the-database">lecture 147. Connecting to the Database</h3>
+<p>시퀄라이즈 다운로드</p>
+<pre><code class="language-terminal"><div>$ npm i --save sequelize
+</div></code></pre>
+<p>시퀄라이즈를 이용한 데이터베이스 연결 코드 작성하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// util/database.js</span>
+<span class="hljs-keyword">const</span> Sequelize = <span class="hljs-built_in">require</span>(<span class="hljs-string">'sequelize'</span>);
+
+<span class="hljs-keyword">const</span> sequelize = <span class="hljs-keyword">new</span> Sequelize(<span class="hljs-string">'node-complete'</span>, <span class="hljs-string">'root'</span>, <span class="hljs-string">'your password'</span>, {
+    <span class="hljs-attr">dialect</span>: <span class="hljs-string">'mysql'</span>,
+    <span class="hljs-attr">host</span>: <span class="hljs-string">'localhost'</span>
+});
+
+<span class="hljs-built_in">module</span>.exports = sequelize;
+</div></code></pre>
+<ul>
+<li>database명, 사용자명, 비밀번호, 다양한 옵션을 인자로 받는다</li>
+<li>dialect는 mysql의 sql문법을 사용한다는 것을 명확하게 가리켜준다</li>
+<li>host를 지정하지 않으면 localhost가 자동으로 지정된다</li>
+</ul>
+<hr>
+<h3 id="lecture-148-defining-a-model">lecture 148. Defining a Model</h3>
+<p>시퀄라이즈를 이용해 product테이블 코드 작성</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// models/product.js</span>
+<span class="hljs-keyword">const</span> Sequelize = <span class="hljs-built_in">require</span>(<span class="hljs-string">'sequelize'</span>);
+
+<span class="hljs-keyword">const</span> sequelize = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../util/database'</span>);
+
+<span class="hljs-keyword">const</span> Product = sequelize.define(<span class="hljs-string">'product'</span>, {
+  <span class="hljs-attr">id</span>: {
+    <span class="hljs-attr">type</span>: Sequelize.INTEGER,
+    <span class="hljs-attr">autoIncrement</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">allowNull</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">primaryKey</span>: <span class="hljs-literal">true</span>
+  },
+  <span class="hljs-attr">title</span>: Sequelize.STRING,
+  <span class="hljs-attr">price</span>: {
+    <span class="hljs-attr">type</span>: Sequelize.DOUBLE,
+    <span class="hljs-attr">allowNull</span>: <span class="hljs-literal">false</span>
+  },
+  <span class="hljs-attr">imageUrl</span>: {
+    <span class="hljs-attr">type</span>: Sequelize.STRING,
+    <span class="hljs-attr">allowNull</span>: <span class="hljs-literal">false</span>
+  },
+  <span class="hljs-attr">description</span>: {
+    <span class="hljs-attr">type</span>: Sequelize.STRING,
+    <span class="hljs-attr">allowNull</span>: <span class="hljs-literal">false</span>
+  }
+});
+
+<span class="hljs-built_in">module</span>.exports = Product;
+</div></code></pre>
+<hr>
+<h3 id="lecture-149-syncing-js-definitions-to-the-database">lecture 149. Syncing JS Definitions to the Database</h3>
+<p>작성한 product코드로 시퀄라이즈를 이용해 실제 데이터베이스 테이블을 생성하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// app.js</span>
+(...)
+<span class="hljs-keyword">const</span> sequelize = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./util/database'</span>);
+
+(...)
+sequelize
+  .sync()
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(result);
+    app.listen(<span class="hljs-number">3000</span>);
+  })
+  .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(e);
+  });
+</div></code></pre>
+<ul>
+<li>Sequelize.sync()는 앞서 Sequelize.define()을 통해 정의한 모델들을 실제 테이블로 생성한다</li>
+<li>비동기 코드이기 때문에 포트를 지정하는 코드를 대너블 체인 안으로 이동시켰다</li>
+<li>기본으로 IF NOT EXISTS를 적용해주기 때문에 서버를 다시 실행한다고 해서 기존 테이블을 덮어쓰지 않는다</li>
+<li>mysql workbench에서 생성된 테이블을 확인해보면 자동으로 추가된 필드 2가지가 있다
+<ul>
+<li>createdAt, updatedAt은 각각 생성, 수정에 대한 타임스탬프다</li>
+<li>자동으로 이 필드들이 생성되는 것이 싫으면 옵션을 추가하면 된다</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="lecture-150-inserting-data--creating-a-product">lecture 150. Inserting Data &amp; Creating a Product</h3>
+<p>생성한 모델을 이용해 데이터 추가하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// controllers/admin.js</span>
+(...)
+exports.postAddProduct = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> title = req.body.title;
+  <span class="hljs-keyword">const</span> imageUrl = req.body.imageUrl;
+  <span class="hljs-keyword">const</span> price = req.body.price;
+  <span class="hljs-keyword">const</span> description = req.body.description;
+ 
+  Product
+    .create({
+      <span class="hljs-attr">title</span> : title,
+      <span class="hljs-attr">price</span> : price,
+      <span class="hljs-attr">imageUrl</span> : imageUrl,
+      <span class="hljs-attr">description</span> : description
+    })
+    .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'CREATED PRODUCT!'</span>);
+      res.redirect(<span class="hljs-string">'/admin/products'</span>);
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(err));
+};
+(...)
+</div></code></pre>
+<ul>
+<li>create메서드에 자바스크립트 오브젝트를 필드들을 채워 넘겨주면 된다</li>
+</ul>
+<hr>
+<h3 id="lecture-151-must-read-findbyid-in-sequelize-5">lecture 151. MUST READ: findById() in Sequelize 5</h3>
+<p>One quick note:</p>
+<p>With Sequelize v5, findById() (which we'll use in this course) was replaced by findByPk()
+You use it in the same way, so you can simply replace all occurrences of findById() with findByPk()</p>
+<ul>
+<li>findById가 findByPk로 대체되었고 사용방법은 같다</li>
+</ul>
+<hr>
+<h3 id="lecture-152-retrieving-data--finding-products">lecture 152. Retrieving Data &amp; Finding Products</h3>
+<p>인덱스 페이지와 상품 페이지 작동을 위한 코드 작성하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// controllers/shop.js</span>
+(...)
+exports.getProducts = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  Product
+    .findAll(<span class="hljs-comment">/* {where: } */</span>)
+    .then(<span class="hljs-function"><span class="hljs-params">products</span> =&gt;</span> {
+      res.render(<span class="hljs-string">'shop/product-list'</span>, {
+        <span class="hljs-attr">prods</span>: products,
+        <span class="hljs-attr">pageTitle</span>: products.title,
+        <span class="hljs-attr">path</span>: <span class="hljs-string">'/products'</span>
+      });
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(e));
+};
+(...)
+exports.getIndex = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  Product
+    .findAll(<span class="hljs-comment">/* {where: } */</span>)
+    .then(<span class="hljs-function"><span class="hljs-params">products</span> =&gt;</span> {
+      res.render(<span class="hljs-string">'shop/index'</span>, {
+        <span class="hljs-attr">prods</span>: products,
+        <span class="hljs-attr">pageTitle</span>: <span class="hljs-string">'Shop'</span>,
+        <span class="hljs-attr">path</span>: <span class="hljs-string">'/'</span>
+      });
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(e));
+};
+</div></code></pre>
+<ul>
+<li>findAll 메서드는 조건에 맞는 모든 데이터를 가져온다</li>
+<li>where 절을 {where : 조건} 형식으로 작성할 수 있다</li>
+</ul>
+<hr>
+<h3 id="lecture-153-getting-a-single-product-with-the-%22where%22-condition">lecture 153. Getting a Single Product with the &quot;where&quot; Condition</h3>
+<p>조건절을 이용해 상품 한 개만 가져오기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// controllers/shop.js</span>
+(...)
+exports.getProduct = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> prodId = req.params.productId;
+  Product.findByPk(prodId)
+    .then(<span class="hljs-function"><span class="hljs-params">product</span> =&gt;</span> {
+      res.render(<span class="hljs-string">'shop/product-detail'</span>, {
+        <span class="hljs-attr">product</span>: product,
+        <span class="hljs-attr">pageTitle</span>: product.title,
+        <span class="hljs-attr">path</span>: <span class="hljs-string">'/products'</span>
+      });
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> <span class="hljs-built_in">console</span>.log);
+};
+(...)
+</div></code></pre>
+<ul>
+<li>findByPk는 id값을 활용해 일치하는 상품을 가져온다</li>
+</ul>
+<p>findAll을 이용해서 같은 결과를 도출하기</p>
+<pre><code class="language-js"><div>Product.findAll({<span class="hljs-attr">where</span>: {<span class="hljs-attr">id</span>: prodId}})
+    .then(<span class="hljs-function"><span class="hljs-params">products</span> =&gt;</span> {
+      res.render(<span class="hljs-string">'shop/product-detail'</span>, {
+        <span class="hljs-attr">product</span>: products[<span class="hljs-number">0</span>],
+        <span class="hljs-attr">pageTitle</span>: products[<span class="hljs-number">0</span>].title,
+        <span class="hljs-attr">path</span>: <span class="hljs-string">'/products'</span>
+      });
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> <span class="hljs-built_in">console</span>.log);
+</div></code></pre>
+<ul>
+<li>findAll에 where절을 이용해 같은 결과를 도출해낼 수 있다</li>
+<li>다른 점은 반환되는 값이 배열이라는 점이다</li>
+</ul>
+<hr>
+<h3 id="lecture-154-fetching-admin-products">lecture 154. Fetching Admin Products</h3>
+<p>Admin 페이지에서 상품을 조회할 수 있도록 코드 작성하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// controllers/admin.js</span>
+(...)
+exports.getProducts = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  Product
+    .findAll()
+    .then(<span class="hljs-function"><span class="hljs-params">products</span> =&gt;</span> {
+      res.render(<span class="hljs-string">'admin/products'</span>, {
+        <span class="hljs-attr">prods</span>: products,
+        <span class="hljs-attr">pageTitle</span>: <span class="hljs-string">'Admin Products'</span>,
+        <span class="hljs-attr">path</span>: <span class="hljs-string">'/admin/products'</span>
+      });
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(err));
+};
+(...)
+</div></code></pre>
+<hr>
+<h3 id="lecture-155-updating-products">lecture 155. Updating Products</h3>
+<p>업데이트할 요소를 가져오고 수정요소를 데이터베이스에 적용하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// controllers/admin.js</span>
+(...)
+exports.getEditProduct = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> editMode = req.query.edit;
+  <span class="hljs-keyword">if</span> (!editMode) {
+    <span class="hljs-keyword">return</span> res.redirect(<span class="hljs-string">'/'</span>);
+  }
+  <span class="hljs-keyword">const</span> prodId = req.params.productId;
+  Product.findByPk(prodId)
+    .then(<span class="hljs-function"><span class="hljs-params">product</span> =&gt;</span> {
+      <span class="hljs-keyword">if</span> (!product) {
+        <span class="hljs-keyword">return</span> res.redirect(<span class="hljs-string">'/'</span>);
+      }
+      res.render(<span class="hljs-string">'admin/edit-product'</span>, {
+        <span class="hljs-attr">pageTitle</span>: <span class="hljs-string">'Edit Product'</span>,
+        <span class="hljs-attr">path</span>: <span class="hljs-string">'/admin/edit-product'</span>,
+        <span class="hljs-attr">editing</span>: editMode,
+        <span class="hljs-attr">product</span>: product
+      });
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(err));
+};
+
+exports.postEditProduct = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> prodId = req.body.productId;
+  <span class="hljs-keyword">const</span> updatedTitle = req.body.title;
+  <span class="hljs-keyword">const</span> updatedPrice = req.body.price;
+  <span class="hljs-keyword">const</span> updatedImageUrl = req.body.imageUrl;
+  <span class="hljs-keyword">const</span> updatedDesc = req.body.description;
+  
+  Product.findByPk(prodId)
+    .then(<span class="hljs-function"><span class="hljs-params">product</span> =&gt;</span> {
+      product.title = updatedTitle;
+      product.price = updatedPrice;
+      product.imageUrl = updatedImageUrl;
+      product.description = updatedDesc;
+      <span class="hljs-keyword">return</span> product.save();
+    })
+    .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"UPDATED PRODUCT!"</span>);
+      res.redirect(<span class="hljs-string">'/admin/products'</span>);
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(err));
+};
+(...)
+</div></code></pre>
+<ul>
+<li>findByPk로 개별 데이터를 가져와서 수정사항을 적용하고 save 메서드를 호출한다</li>
+<li>save 메서드를 호출한 것을 리턴해서 대너블체인으로 한 번 더 연결한 다음 응답 코드를 실행하고 있다</li>
+</ul>
+<hr>
+<h3 id="lecture-156-deleting-products">lecture 156. Deleting Products</h3>
+<p>삭제 로직 추가하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// controllers/admin.js</span>
+(...)
+exports.postDeleteProduct = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> prodId = req.body.productId;
+  Product.findByPk(prodId)
+    .then(<span class="hljs-function"><span class="hljs-params">product</span> =&gt;</span> {
+      <span class="hljs-keyword">return</span> product.destroy();
+    })
+    .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'DESTROYED PRODUCT!'</span>);
+      res.redirect(<span class="hljs-string">'/admin/products'</span>);
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(err));
+};
+(...)
+</div></code></pre>
+<ul>
+<li>id로 데이터를 찾아낸 다음 destroy메서드를 호출한 것을 리턴한다</li>
+<li>리턴한 프로미스를 대너블 체인을 이용해 응답 코드를 실행한다</li>
+</ul>
+<hr>
+<h3 id="lecture-157-creating-a-user-model">lecture 157. Creating a User Model</h3>
+<p>user 테이블 생성하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// models/user.js</span>
+<span class="hljs-keyword">const</span> Sequelize = <span class="hljs-built_in">require</span>(<span class="hljs-string">'sequelize'</span>);
+
+<span class="hljs-keyword">const</span> sequelize = <span class="hljs-built_in">require</span>(<span class="hljs-string">'../util/database'</span>);
+
+<span class="hljs-keyword">const</span> User = sequelize.define(<span class="hljs-string">'user'</span>, {
+  <span class="hljs-attr">id</span>: {
+    <span class="hljs-attr">type</span>: Sequelize.INTEGER,
+    <span class="hljs-attr">autoIncrement</span>: <span class="hljs-literal">true</span>,
+    <span class="hljs-attr">allowNull</span>: <span class="hljs-literal">false</span>,
+    <span class="hljs-attr">primaryKey</span>: <span class="hljs-literal">true</span>
+  },
+  <span class="hljs-attr">name</span>: Sequelize.STRING,
+  <span class="hljs-attr">email</span>: Sequelize.STRING
+});
+
+<span class="hljs-built_in">module</span>.exports = User;
+</div></code></pre>
+<hr>
+<h3 id="lecture-158-adding-a-one-to-many-relationship">lecture 158. Adding a One-To-Many Relationship</h3>
+<p>쇼핑몰 모델들의 관계
+<img src="file:///c:\Users\user\programming\nodeprac\max-node\img\association.png" alt="Relationship_of_models"></p>
+<p>유저와 상품에 1:N관계 적용하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// app.js</span>
+(...)
+<span class="hljs-keyword">const</span> Product = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./models/product'</span>);
+<span class="hljs-keyword">const</span> User = <span class="hljs-built_in">require</span>(<span class="hljs-string">'./models/user'</span>);
+
+(...)
+Product.belongsTo(User, { <span class="hljs-attr">constraints</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">onDelete</span>: <span class="hljs-string">'CASCADE'</span> });
+User.hasMany(Product);
+(...)
+</div></code></pre>
+<ul>
+<li>belongsTo는 메서드를 호출한 모델이 첫 번째 인자로 넘어온 모델에 속하도록(1:N) 관계 맺는다</li>
+<li>두번째 인자에는 여러 옵션들을 지정할 수 있다</li>
+<li>onDelete는 관계맺은 데이터가 사라졌을 때 처리방식을 지정한 것이다</li>
+<li>이렇게만 코드를 작성하면 기존 테이블이 있는 경우 관계가 적용되지 않는다</li>
+</ul>
+<p>이미 작성된 테이블이 있으면 덮어쓰도록 강제하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// app.js</span>
+(...)
+sequelize
+  .sync({ <span class="hljs-attr">force</span>: <span class="hljs-literal">true</span> })
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    app.listen(<span class="hljs-number">3000</span>);
+  })
+  .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(e);
+  });
+</div></code></pre>
+<ul>
+<li>sync 메서드에 force를 true로 지정하면 기존 테이블을 강제로 덮어쓴다</li>
+<li>workbench에서 확인해보면 관계가 지정됐음을 확인할 수 있다</li>
+<li>매번 서버를 실행할때마다 테이블을 덮어쓰지 않으려면 한번만 적용하고 force는 지워야한다</li>
+</ul>
+<hr>
+<h3 id="lecture-159-creating--managing-a-dummy-user">lecture 159. Creating &amp; Managing a Dummy User</h3>
+<p>인증을 적용하지 않은 상태에서 더미 유저 생성하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// app.js</span>
+(...)
+sequelize
+  .sync()
+  .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+    <span class="hljs-keyword">return</span> User.findByPk(<span class="hljs-number">1</span>);
+  })
+  .then(<span class="hljs-function"><span class="hljs-params">user</span> =&gt;</span> {
+    <span class="hljs-keyword">if</span> (!user) {
+      <span class="hljs-keyword">return</span> User.create({ <span class="hljs-attr">name</span>: <span class="hljs-string">'ES'</span>, <span class="hljs-attr">email</span>: <span class="hljs-string">'esbae@google.com'</span> });
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">Promise</span>.resolve(user);
+  })
+  .then(<span class="hljs-function"><span class="hljs-params">user</span> =&gt;</span> {
+    app.listen(<span class="hljs-number">3000</span>);
+  })
+  .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> {
+    <span class="hljs-built_in">console</span>.log(e);
+  });
+
+</div></code></pre>
+<p>요청이 들어올때마다 프로퍼티에 user가 생성되어 있도록 미들웨어 만들기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// app.js</span>
+(...)
+app.use(<span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  User.findByPk(<span class="hljs-number">1</span>)
+    .then(<span class="hljs-function"><span class="hljs-params">user</span> =&gt;</span> {
+      req.user = user;
+      next();
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(err));
+});
+(...)
+</div></code></pre>
+<ul>
+<li>이 미들웨어는 시퀄라이즈가 sync하기 이전에 절대 실행되지 않는다</li>
+<li>미들웨어는 오직 사용자의 요청이 들어왔을 때 실행된다</li>
+</ul>
+<hr>
+<h3 id="lecture-160-using-magic-association-methods">lecture 160. Using Magic Association Methods</h3>
+<p>앞서 만든 더미유저를 상품이 추가될 때마다 연동하기</p>
+<pre><code class="language-js"><div><span class="hljs-comment">// controllers/admin.js</span>
+(...)
+exports.postAddProduct = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> title = req.body.title;
+  <span class="hljs-keyword">const</span> imageUrl = req.body.imageUrl;
+  <span class="hljs-keyword">const</span> price = req.body.price;
+  <span class="hljs-keyword">const</span> description = req.body.description;
+ 
+  Product
+    .create({
+      <span class="hljs-attr">title</span> : title,
+      <span class="hljs-attr">price</span> : price,
+      <span class="hljs-attr">imageUrl</span> : imageUrl,
+      <span class="hljs-attr">description</span> : description,
+      <span class="hljs-attr">userId</span>: req.user.id
+    })
+    .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'CREATED PRODUCT!'</span>);
+      res.redirect(<span class="hljs-string">'/admin/products'</span>);
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(err));
+};
+(...)
+</div></code></pre>
+<ul>
+<li>userId 필드를 미들웨어로 넘겨준 req.user를 이용해서 지정하고 있다</li>
+</ul>
+<p>hasMany 관계일때 시퀄라이즈가 제공하는 마법같은 메소드</p>
+<pre><code class="language-js"><div>exports.postAddProduct = <span class="hljs-function">(<span class="hljs-params">req, res, next</span>) =&gt;</span> {
+  <span class="hljs-keyword">const</span> title = req.body.title;
+  <span class="hljs-keyword">const</span> imageUrl = req.body.imageUrl;
+  <span class="hljs-keyword">const</span> price = req.body.price;
+  <span class="hljs-keyword">const</span> description = req.body.description;
+ 
+  req.user.createProduct({
+      <span class="hljs-attr">title</span> : title,
+      <span class="hljs-attr">price</span> : price,
+      <span class="hljs-attr">imageUrl</span> : imageUrl,
+      <span class="hljs-attr">description</span> : description,
+    })
+    .then(<span class="hljs-function"><span class="hljs-params">result</span> =&gt;</span> {
+      <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'CREATED PRODUCT!'</span>);
+      res.redirect(<span class="hljs-string">'/admin/products'</span>);
+    })
+    .catch(<span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(err));
+};
+</div></code></pre>
+<ul>
+<li>직접 userId를 지정하지 않으면서 위 코드와 똑같이 동작한다</li>
+</ul>
+
+    </body>
+    </html>
